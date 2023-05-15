@@ -2,8 +2,8 @@ use super::{Point, Vec3};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Ray {
-    origin: Point,
-    direction: Vec3,
+    pub origin: Point,
+    pub direction: Vec3,
 }
 
 impl Ray {
