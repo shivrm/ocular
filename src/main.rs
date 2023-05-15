@@ -5,7 +5,8 @@ const HEIGHT: usize = 36;
 
 fn main() {
     let camera = Camera::new(Point::new(0.0, 0.0, 0.0), 3.55, 2.0, 1.0);
-    let scene = Scene::new(camera);
+    let sky = ocular::texture::Sky;
+    let scene = Scene::new(camera, Box::new(sky));
     let image = scene.render(WIDTH, HEIGHT);
 
     let mut bitmap = bmp::Image::new(WIDTH as u32, HEIGHT as u32);

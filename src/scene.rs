@@ -1,18 +1,19 @@
-use super::{Camera, Color, Image, Pixel, Ray};
+use super::{Camera, Color, Image, Pixel, Point, Ray, Texture};
 
 pub struct Scene {
     camera: Camera,
+    texture: Box<dyn Texture>,
 }
 
 impl Scene {
-    pub const fn new(camera: Camera) -> Self {
-        Self { camera }
+    pub const fn new(camera: Camera, texture: Box<dyn Texture>) -> Self {
+        Self { camera, texture }
     }
 
     pub fn ray_color(&self, ray: Ray) -> Color {
-        let unit_direction = ray.direction.unit();
-        let t = 0.5 * (unit_direction.y + 1.0);
-        ((1.0 - t) * Color::new(1.0, 1.0, 1.0)) + (t * Color::new(0.5, 0.7, 1.0))
+        let (u, v) = super::texture::uv_coords(ray.direction);
+        let p = Point::new(f32::INFINITY, f32::INFINITY, f32::INFINITY);
+        self.texture.color(u, v, p)
     }
 
     pub fn render(&self, width: usize, height: usize) -> Image {

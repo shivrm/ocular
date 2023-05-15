@@ -13,6 +13,9 @@ pub use scene::Scene;
 mod image;
 pub use image::{Image, Pixel};
 
+pub mod texture;
+pub use texture::Texture;
+
 // Aliases
 pub type Point = Vec3;
 pub type Color = Vec3;
