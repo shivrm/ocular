@@ -8,7 +8,7 @@ mod camera;
 pub use camera::Camera;
 
 mod scene;
-pub use scene::Scene;
+pub use scene::{RenderOptions, Scene};
 
 mod image;
 pub use image::{Image, Pixel};

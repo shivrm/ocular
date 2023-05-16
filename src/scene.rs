@@ -1,5 +1,15 @@
 use super::{Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture};
 
+#[derive(Debug, Clone, Copy)]
+pub struct RenderOptions {
+    pub width: usize,
+    pub height: usize,
+    pub samples: usize,
+    pub bounces: usize,
+    pub clip_start: f32,
+    pub clip_end: f32,
+}
+
 pub struct Scene {
     camera: Camera,
     texture: Box<dyn Texture>,
@@ -19,8 +29,12 @@ impl Scene {
         }
     }
 
-    pub fn ray_color(&self, ray: Ray) -> Color {
-        let record = self.hit(ray, 0.001, f32::INFINITY);
+    pub fn ray_color(&self, ray: Ray, t_min: f32, t_max: f32, bounces: usize) -> Color {
+        if bounces == 0 {
+            return Color::new(0.0, 0.0, 0.0);
+        }
+
+        let record = self.hit(ray, t_min, t_max);
 
         if record.is_some() {
             let record = record.unwrap();
@@ -52,16 +66,17 @@ impl Scene {
         hit_record
     }
 
-    pub fn render(&self, width: usize, height: usize) -> Image {
-        let mut image = Image::new(width, height);
+    pub fn render(&self, options: RenderOptions) -> Image {
+        let mut image = Image::new(options.width, options.height);
 
-        for y in 0..height {
-            for x in 0..width {
-                let frac_x = (x as f32) / (width as f32);
-                let frac_y = (y as f32) / (height as f32);
+        for y in 0..options.height {
+            for x in 0..options.width {
+                let frac_x = (x as f32) / (options.width as f32);
+                let frac_y = (y as f32) / (options.height as f32);
 
                 let ray = self.camera.ray(frac_x, frac_y);
-                let color = self.ray_color(ray);
+                let color =
+                    self.ray_color(ray, options.clip_start, options.clip_end, options.bounces);
                 image.set_pixel(x, y, Pixel::from_color(color));
             }
         }
