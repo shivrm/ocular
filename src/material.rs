@@ -9,7 +9,7 @@ pub struct Diffuse {
 }
 
 impl Diffuse {
-    fn new(texture: Box<dyn Texture>) -> Self {
+    pub fn new(texture: Box<dyn Texture>) -> Self {
         Self { texture }
     }
 }

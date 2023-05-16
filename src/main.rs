@@ -1,12 +1,19 @@
-use ocular::{Camera, Point, Scene};
+use ocular::*;
 
 const WIDTH: usize = 64;
 const HEIGHT: usize = 36;
 
 fn main() {
     let camera = Camera::new(Point::new(0.0, 0.0, 0.0), 3.55, 2.0, 1.0);
-    let sky = ocular::texture::Sky;
-    let scene = Scene::new(camera, Box::new(sky));
+    let sky = texture::Sky;
+
+    let texture = texture::Solid::new(Color::new(1.0, 0.0, 0.0));
+    let material = material::Diffuse::new(Box::new(texture));
+
+    let sphere = object::Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, Box::new(material));
+    let objects: Vec<Box<dyn Hittable>> = vec![Box::new(sphere)];
+
+    let scene = Scene::new(camera, Box::new(sky), objects);
     let image = scene.render(WIDTH, HEIGHT);
 
     let mut bitmap = bmp::Image::new(WIDTH as u32, HEIGHT as u32);

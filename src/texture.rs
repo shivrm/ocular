@@ -18,3 +18,19 @@ pub fn uv_coords(p: Point) -> (f32, f32) {
     let v = (unit.y * 0.5) + 0.5;
     (u, v)
 }
+
+pub struct Solid {
+    color: Color,
+}
+
+impl Solid {
+    pub const fn new(color: Color) -> Self {
+        Self { color }
+    }
+}
+
+impl Texture for Solid {
+    fn color(&self, _u: f32, _v: f32, _p: Point) -> Color {
+        self.color
+    }
+}
