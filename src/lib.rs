@@ -16,6 +16,9 @@ pub use image::{Image, Pixel};
 pub mod texture;
 pub use texture::Texture;
 
+pub mod object;
+pub use object::Hittable;
+
 // Aliases
 pub type Point = Vec3;
 pub type Color = Vec3;
