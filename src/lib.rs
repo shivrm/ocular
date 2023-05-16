@@ -17,8 +17,16 @@ pub mod texture;
 pub use texture::Texture;
 
 pub mod object;
-pub use object::Hittable;
+pub use object::{HitRecord, Hittable};
+
+pub mod material;
+pub use material::Material;
 
 // Aliases
 pub type Point = Vec3;
 pub type Color = Vec3;
+
+fn random() -> f32 {
+    use rand::Rng;
+    rand::thread_rng().gen_range(0.0..0.1)
+}

@@ -1,3 +1,4 @@
+use super::random;
 use core::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug, Clone, Copy)]
@@ -34,6 +35,15 @@ impl Vec3 {
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x,
         )
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let v = Vec3::new(random(), random(), random());
+            if v.len() < 1.0 {
+                return v;
+            }
+        }
     }
 }
 

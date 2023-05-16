@@ -1,26 +1,31 @@
-use super::{Point, Ray, Vec3};
+use super::{Material, Point, Ray, Vec3};
 
 pub trait Hittable {
     fn hit(&self, ray: Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub point: Point,
     pub normal: Vec3,
     pub front_face: bool,
     pub t: f32,
     pub uv: (f32, f32),
+    pub material: &'a dyn Material,
 }
 
 pub struct Sphere {
     center: Point,
     radius: f32,
+    material: Box<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point, radius: f32) -> Self {
-        Self { center, radius }
+    pub fn new(center: Point, radius: f32, material: Box<dyn Material>) -> Self {
+        Self {
+            center,
+            radius,
+            material,
+        }
     }
 
     pub fn normal_at(&self, point: Point) -> Vec3 {
@@ -64,6 +69,7 @@ impl Hittable for Sphere {
             front_face,
             t,
             uv,
+            material: &*self.material,
         })
     }
 }
