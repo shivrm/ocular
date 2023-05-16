@@ -1,7 +1,7 @@
 use ocular::*;
 
-const WIDTH: usize = 64;
-const HEIGHT: usize = 36;
+const WIDTH: usize = 640;
+const HEIGHT: usize = 360;
 const SAMPLES_PER_PIXEL: usize = 16;
 const BOUNCES: usize = 16;
 const CLIP_START: f32 = 0.01;
@@ -11,11 +11,21 @@ fn main() {
     let camera = Camera::new(Point::new(0.0, 0.0, 0.0), 3.55, 2.0, 1.0);
     let sky = texture::Sky;
 
-    let texture = texture::Solid::new(Color::new(1.0, 0.0, 0.0));
-    let material = material::Diffuse::new(Box::new(texture));
+    let front = {
+        let texture = texture::Solid::new(Color::new(0.7, 0.3, 0.3));
+        let material = material::Diffuse::new(Box::new(texture));
+        let sphere = object::Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, Box::new(material));
+        Box::new(sphere)
+    };
 
-    let sphere = object::Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, Box::new(material));
-    let objects: Vec<Box<dyn Hittable>> = vec![Box::new(sphere)];
+    let ground = {
+        let texture = texture::Solid::new(Color::new(0.8, 0.8, 0.0));
+        let material = material::Diffuse::new(Box::new(texture));
+        let sphere = object::Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, Box::new(material));
+        Box::new(sphere)
+    };
+
+    let objects: Vec<Box<dyn Hittable>> = vec![front, ground];
 
     let options = RenderOptions {
         width: WIDTH,

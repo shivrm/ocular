@@ -28,5 +28,5 @@ pub type Color = Vec3;
 
 fn random() -> f32 {
     use rand::Rng;
-    rand::thread_rng().gen_range(0.0..0.1)
+    rand::thread_rng().gen_range(0.0..1.0)
 }

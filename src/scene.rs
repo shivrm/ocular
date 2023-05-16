@@ -1,4 +1,4 @@
-use super::{Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture};
+use super::{random, Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RenderOptions {
@@ -38,8 +38,14 @@ impl Scene {
 
         if record.is_some() {
             let record = record.unwrap();
-            let (_, color) = record.material.scatter(ray, record);
-            color
+            let (scattered, color1) = record.material.scatter(ray, record);
+            let color2 = self.ray_color(scattered, t_min, t_max, bounces - 1);
+
+            Color::new(
+                color1.x * color2.x,
+                color1.y * color2.y,
+                color1.z * color2.z,
+            )
         } else {
             let (u, v) = super::texture::uv_coords(ray.direction);
             let p = Point::new(f32::INFINITY, f32::INFINITY, f32::INFINITY);
@@ -71,13 +77,18 @@ impl Scene {
 
         for y in 0..options.height {
             for x in 0..options.width {
-                let frac_x = (x as f32) / (options.width as f32);
-                let frac_y = (y as f32) / (options.height as f32);
+                let mut color_sum = Color::new(0.0, 0.0, 0.0);
+                for _ in 0..options.samples {
+                    let frac_x = (x as f32 + random()) / (options.width as f32);
+                    let frac_y = (y as f32 + random()) / (options.height as f32);
 
-                let ray = self.camera.ray(frac_x, frac_y);
-                let color =
-                    self.ray_color(ray, options.clip_start, options.clip_end, options.bounces);
-                image.set_pixel(x, y, Pixel::from_color(color));
+                    let ray = self.camera.ray(frac_x, frac_y);
+                    let color =
+                        self.ray_color(ray, options.clip_start, options.clip_end, options.bounces);
+                    color_sum = color_sum + color;
+                }
+                color_sum = color_sum / (options.samples as f32);
+                image.set_pixel(x, y, Pixel::from_color(color_sum));
             }
         }
         image
