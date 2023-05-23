@@ -32,7 +32,13 @@ fn main() {
         Box::new(sphere)
     };
 
-    let objects: Vec<Box<dyn Hittable>> = vec![front, ground, left];
+    let right = {
+        let material = material::Glass::new(1.5);
+        let sphere = object::Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, Box::new(material));
+        Box::new(sphere)
+    };
+
+    let objects: Vec<Box<dyn Hittable>> = vec![front, ground, left, right];
 
     let options = RenderOptions {
         width: WIDTH,

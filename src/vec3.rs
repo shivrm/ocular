@@ -41,6 +41,13 @@ impl Vec3 {
         *self - (2.0 * normal * self.dot(&normal))
     }
 
+    pub fn refract(&self, normal: Vec3, ri: f32) -> Vec3 {
+        let cos_theta = f32::min(-self.dot(&normal), 1.0);
+        let r_perp = (*self + (normal * cos_theta)) * ri;
+        let r_para = normal * -((1.0 - r_perp.dot(&r_perp)).abs().sqrt());
+        r_perp + r_para
+    }
+
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let v = Vec3::new(random(), random(), random());

@@ -49,3 +49,30 @@ impl Material for Metal {
         (scattered, color)
     }
 }
+
+pub struct Glass {
+    refractive_index: f32,
+}
+
+impl Glass {
+    pub fn new(refractive_index: f32) -> Self {
+        Self { refractive_index }
+    }
+}
+
+impl Material for Glass {
+    fn scatter(&self, ray: Ray, hit_record: HitRecord) -> (Ray, Color) {
+        let color = Color::new(1.0, 1.0, 1.0);
+
+        let ri_inverse = if hit_record.front_face {
+            1.0 / self.refractive_index
+        } else {
+            self.refractive_index
+        };
+
+        let unit_direction = ray.direction.unit();
+        let target = unit_direction.refract(hit_record.normal, ri_inverse);
+        let scattered = Ray::new(hit_record.point, target);
+        (scattered, color)
+    }
+}
