@@ -27,7 +27,7 @@ fn main() {
 
     let left = {
         let texture = texture::Solid::new(Color::new(0.8, 0.8, 0.8));
-        let material = material::Metal::new(Box::new(texture));
+        let material = material::Metal::new(Box::new(texture), 0.3);
         let sphere = object::Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5, Box::new(material));
         Box::new(sphere)
     };

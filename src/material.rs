@@ -28,11 +28,12 @@ impl Material for Diffuse {
 
 pub struct Metal {
     texture: Box<dyn Texture>,
+    roughness: f32,
 }
 
 impl Metal {
-    pub fn new(texture: Box<dyn Texture>) -> Self {
-        Self { texture }
+    pub fn new(texture: Box<dyn Texture>, roughness: f32) -> Self {
+        Self { texture, roughness }
     }
 }
 
@@ -42,7 +43,8 @@ impl Material for Metal {
         let color = self.texture.color(u, v, hit_record.point);
 
         let target = ray.direction.reflect(hit_record.normal);
-        let scattered = Ray::new(hit_record.point, target);
+        let random = self.roughness * Vec3::random_in_unit_sphere();
+        let scattered = Ray::new(hit_record.point, target + random);
 
         (scattered, color)
     }
