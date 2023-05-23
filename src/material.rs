@@ -71,8 +71,23 @@ impl Material for Glass {
         };
 
         let unit_direction = ray.direction.unit();
-        let target = unit_direction.refract(hit_record.normal, ri_inverse);
+        let cos_theta = f32::min(-unit_direction.dot(&hit_record.normal), 1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        let cannot_refract = ri_inverse * sin_theta > 1.0;
+        let target = if cannot_refract || schlick(cos_theta, ri_inverse) > super::random() {
+            unit_direction.reflect(hit_record.normal)
+        } else {
+            unit_direction.refract(hit_record.normal, ri_inverse)
+        };
+
         let scattered = Ray::new(hit_record.point, target);
         (scattered, color)
     }
+}
+
+fn schlick(cosine: f32, ri: f32) -> f32 {
+    let r0 = (1.0 - ri) / (1.0 + ri);
+    let r0 = r0 * r0;
+    r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
