@@ -4,6 +4,7 @@ use super::{random, Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray
 pub struct RenderOptions {
     pub width: usize,
     pub height: usize,
+    pub crop_region: ((usize, usize), (usize, usize)),
     pub samples: usize,
     pub bounces: usize,
     pub clip_start: f32,
@@ -73,10 +74,12 @@ impl Scene {
     }
 
     pub fn render(&self, options: RenderOptions) -> Image {
-        let mut image = Image::new(options.width, options.height);
+        let ((x_start, x_end), (y_start, y_end)) = options.crop_region;
 
-        for y in 0..options.height {
-            for x in 0..options.width {
+        let mut image = Image::new(x_end - x_start, y_end - y_start);
+
+        for y in y_start..y_end {
+            for x in x_start..x_end {
                 let mut color_sum = Color::new(0.0, 0.0, 0.0);
                 for _ in 0..options.samples {
                     let frac_x = (x as f32 + random()) / (options.width as f32);
@@ -88,7 +91,7 @@ impl Scene {
                     color_sum = color_sum + color;
                 }
                 color_sum = color_sum / (options.samples as f32);
-                image.set_pixel(x, y, Pixel::from_color(color_sum));
+                image.set_pixel(x - x_start, y - y_start, Pixel::from_color(color_sum));
             }
         }
         image

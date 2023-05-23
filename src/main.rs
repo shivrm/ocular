@@ -43,6 +43,7 @@ fn main() {
     let options = RenderOptions {
         width: WIDTH,
         height: HEIGHT,
+        crop_region: ((0, WIDTH), (0, HEIGHT)),
         samples: SAMPLES_PER_PIXEL,
         bounces: BOUNCES,
         clip_start: CLIP_START,
