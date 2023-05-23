@@ -9,11 +9,10 @@ pub struct Pixel {
 
 impl Pixel {
     pub fn from_color(color: Color) -> Pixel {
-        let color = color * 255.999;
         Pixel {
-            r: color.x as u8,
-            g: color.y as u8,
-            b: color.z as u8,
+            r: (color.x.sqrt() * 255.999) as u8,
+            g: (color.y.sqrt() * 255.999) as u8,
+            b: (color.z.sqrt() * 255.999) as u8,
         }
     }
 }

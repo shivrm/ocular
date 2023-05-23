@@ -37,6 +37,10 @@ impl Vec3 {
         )
     }
 
+    pub fn reflect(&self, normal: Vec3) -> Vec3 {
+        *self - (2.0 * normal * self.dot(&normal))
+    }
+
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let v = Vec3::new(random(), random(), random());

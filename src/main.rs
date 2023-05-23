@@ -25,7 +25,14 @@ fn main() {
         Box::new(sphere)
     };
 
-    let objects: Vec<Box<dyn Hittable>> = vec![front, ground];
+    let left = {
+        let texture = texture::Solid::new(Color::new(0.8, 0.8, 0.8));
+        let material = material::Metal::new(Box::new(texture));
+        let sphere = object::Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5, Box::new(material));
+        Box::new(sphere)
+    };
+
+    let objects: Vec<Box<dyn Hittable>> = vec![front, ground, left];
 
     let options = RenderOptions {
         width: WIDTH,

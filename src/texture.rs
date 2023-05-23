@@ -14,8 +14,12 @@ impl Texture for Sky {
 
 pub fn uv_coords(p: Point) -> (f32, f32) {
     let unit = p.unit();
-    let u = (f32::atan2(unit.x, unit.z) / std::f32::consts::TAU) + 0.5;
-    let v = (unit.y * 0.5) + 0.5;
+
+    let theta = (-unit.y).acos();
+    let phi = f32::atan2(-unit.z, unit.x) + std::f32::consts::PI;
+
+    let u = phi / std::f32::consts::TAU;
+    let v = theta / std::f32::consts::PI;
     (u, v)
 }
 
