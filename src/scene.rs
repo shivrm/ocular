@@ -1,4 +1,5 @@
 use super::{random, Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture};
+use std::sync::mpsc;
 
 #[derive(Debug, Clone, Copy)]
 pub struct RenderOptions {
@@ -9,6 +10,7 @@ pub struct RenderOptions {
     pub bounces: usize,
     pub clip_start: f32,
     pub clip_end: f32,
+    pub block_size: usize,
 }
 
 pub struct Scene {
@@ -95,5 +97,46 @@ impl Scene {
             }
         }
         image
+    }
+
+    pub fn threaded_render(&self, options: RenderOptions) -> Image {
+        let ((x_start, x_end), (y_start, y_end)) = options.crop_region;
+        let (tx, rx) = mpsc::channel();
+
+        let mut num_blocks = 0;
+        std::thread::scope(|s| {
+            for x in (x_start..x_end).step_by(options.block_size) {
+                for y in (y_start..y_end).step_by(options.block_size) {
+                    num_blocks += 1;
+                    let options = RenderOptions {
+                        crop_region: ((x, x + options.block_size), (y, y + options.block_size)),
+                        ..options
+                    };
+                    let tx = tx.clone();
+                    s.spawn(move || {
+                        let img = self.render(options);
+                        tx.send((x, y, img)).unwrap();
+                    });
+                }
+            }
+        });
+
+        let mut final_img = Image::new(x_end - x_start, y_end - y_start);
+
+        for (x_offset, y_offset, img) in rx.iter().take(num_blocks) {
+            for x in 0..options.block_size {
+                if x + x_offset >= x_end {
+                    break;
+                }
+                for y in 0..options.block_size {
+                    if y + y_offset >= y_end {
+                        break;
+                    }
+                    let pixel = img.get_pixel(x, y);
+                    final_img.set_pixel(x_offset + x, y_offset + y, pixel);
+                }
+            }
+        }
+        final_img
     }
 }

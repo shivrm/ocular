@@ -8,6 +8,6 @@ pub use metal::Metal;
 
 use super::{Color, HitRecord, Ray};
 
-pub trait Material {
+pub trait Material: Send + Sync {
     fn scatter(&self, ray: Ray, hit_record: HitRecord) -> (Ray, Color);
 }

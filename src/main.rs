@@ -2,10 +2,11 @@ use ocular::*;
 
 const WIDTH: usize = 640;
 const HEIGHT: usize = 360;
-const SAMPLES_PER_PIXEL: usize = 16;
-const BOUNCES: usize = 16;
+const SAMPLES_PER_PIXEL: usize = 64;
+const BOUNCES: usize = 32;
 const CLIP_START: f32 = 0.01;
 const CLIP_END: f32 = f32::INFINITY;
+const BLOCK_SIZE: usize = 32;
 
 fn main() {
     let camera = Camera::new(Point::new(0.0, 0.0, 0.0), 3.55, 2.0, 1.0);
@@ -48,10 +49,11 @@ fn main() {
         bounces: BOUNCES,
         clip_start: CLIP_START,
         clip_end: CLIP_END,
+        block_size: BLOCK_SIZE,
     };
 
     let scene = Scene::new(camera, Box::new(sky), objects);
-    let image = scene.render(options);
+    let image = scene.threaded_render(options);
 
     let mut bitmap = bmp::Image::new(WIDTH as u32, HEIGHT as u32);
     for y in 0..HEIGHT {

@@ -1,6 +1,6 @@
 use super::{Color, Point};
 
-pub trait Texture {
+pub trait Texture: Send + Sync {
     fn color(&self, u: f32, v: f32, p: Point) -> Color;
 }
 
