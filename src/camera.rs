@@ -8,12 +8,20 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(origin: Point, vw: f32, vh: f32, focal_length: f32) -> Self {
-        let horizontal = Vec3::new(vw, 0.0, 0.0);
-        let vertical = Vec3::new(0.0, vh, 0.0);
+    pub fn new(lookfrom: Point, lookat: Point, vup: Vec3, vfov: f32, aspect_ratio: f32) -> Self {
+        let h = (vfov.to_radians() / 2.0).tan();
+        let viewport_height = 2.0 * h;
+        let viewport_width = aspect_ratio * viewport_height;
 
-        let screen_top_left =
-            origin - (horizontal / 2.0) + (vertical / 2.0) - Vec3::new(0.0, 0.0, focal_length);
+        let w = (lookfrom - lookat).unit();
+        let u = vup.cross(&w).unit();
+        let v = w.cross(&u);
+
+        let origin = lookfrom;
+        let horizontal = viewport_width * u;
+        let vertical = viewport_height * v;
+
+        let screen_top_left = origin - (horizontal / 2.0) + (vertical / 2.0) - w;
 
         Self {
             origin,

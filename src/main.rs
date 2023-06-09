@@ -2,44 +2,88 @@ use ocular::*;
 
 const WIDTH: usize = 640;
 const HEIGHT: usize = 360;
+
+const LOOKFROM: Point = Point::new(13.0, 2.0, 3.0);
+const LOOKAT: Point = Point::new(0.0, 0.0, 0.0);
+const CAMERA_UP: Point = Point::new(0.0, 1.0, 0.0);
+const FOV: f32 = 20.0;
+const ASPECT_RATIO: f32 = (WIDTH as f32) / (HEIGHT as f32);
+
 const SAMPLES_PER_PIXEL: usize = 64;
-const BOUNCES: usize = 32;
+const BOUNCES: usize = 16;
 const CLIP_START: f32 = 0.01;
 const CLIP_END: f32 = f32::INFINITY;
 const BLOCK_SIZE: usize = 32;
 
 fn main() {
-    let camera = Camera::new(Point::new(0.0, 0.0, 0.0), 3.55, 2.0, 1.0);
+    let camera = Camera::new(LOOKFROM, LOOKAT, CAMERA_UP, FOV, ASPECT_RATIO);
     let sky = texture::Sky;
 
-    let front = {
-        let texture = texture::Solid::new(Color::new(0.7, 0.3, 0.3));
+    let mut objects: Vec<Box<dyn Hittable>> = Vec::new();
+
+    for i in -11..11 {
+        for j in -11..11 {
+            let center = Point::new(
+                i as f32 + (0.9 * random()),
+                0.2,
+                j as f32 + (0.9 * random()),
+            );
+
+            if (center - Point::new(4.0, 0.2, 0.0)).len() < 0.9 {
+                continue;
+            }
+
+            let r = random();
+
+            let material: Box<dyn Material> = if r < 0.8 {
+                let texture = texture::Solid::new(Color::random_in_unit_sphere());
+                let material = material::Diffuse::new(Box::new(texture));
+                Box::new(material)
+            } else if r < 0.95 {
+                let texture = texture::Solid::new(Color::random_in_unit_sphere());
+                let material = material::Metal::new(Box::new(texture), random());
+                Box::new(material)
+            } else {
+                let material = material::Glass::new(1.5);
+                Box::new(material)
+            };
+
+            let sphere = object::Sphere::new(center, 0.2, material);
+            objects.push(Box::new(sphere));
+        }
+    }
+
+    let s1 = {
+        let material = material::Glass::new(1.5);
+        let sphere = object::Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0, Box::new(material));
+        Box::new(sphere)
+    };
+
+    let s2 = {
+        let texture = texture::Solid::new(Color::new(0.4, 0.2, 0.1));
         let material = material::Diffuse::new(Box::new(texture));
-        let sphere = object::Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, Box::new(material));
+        let sphere = object::Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0, Box::new(material));
+        Box::new(sphere)
+    };
+
+    let s3 = {
+        let texture = texture::Solid::new(Color::new(0.7, 0.6, 0.5));
+        let material = material::Metal::new(Box::new(texture), 0.0);
+        let sphere = object::Sphere::new(Point::new(4.0, 1.0, 0.0), 1.0, Box::new(material));
         Box::new(sphere)
     };
 
     let ground = {
-        let texture = texture::Solid::new(Color::new(0.8, 0.8, 0.0));
+        let texture = texture::Solid::new(Color::new(0.5, 0.5, 0.5));
         let material = material::Diffuse::new(Box::new(texture));
-        let sphere = object::Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, Box::new(material));
+        let sphere = object::Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0, Box::new(material));
         Box::new(sphere)
     };
 
-    let left = {
-        let texture = texture::Solid::new(Color::new(0.8, 0.8, 0.8));
-        let material = material::Metal::new(Box::new(texture), 0.3);
-        let sphere = object::Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5, Box::new(material));
-        Box::new(sphere)
-    };
-
-    let right = {
-        let material = material::Glass::new(1.5);
-        let sphere = object::Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, Box::new(material));
-        Box::new(sphere)
-    };
-
-    let objects: Vec<Box<dyn Hittable>> = vec![front, ground, left, right];
+    objects.push(s1);
+    objects.push(s2);
+    objects.push(s3);
+    objects.push(ground);
 
     let options = RenderOptions {
         width: WIDTH,
