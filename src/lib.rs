@@ -26,7 +26,7 @@ pub use material::Material;
 pub type Point = Vec3;
 pub type Color = Vec3;
 
-pub fn random() -> f32 {
+pub fn random(min: f32, max: f32) -> f32 {
     use rand::Rng;
-    rand::thread_rng().gen_range(0.0..1.0)
+    rand::thread_rng().gen_range(min..max)
 }

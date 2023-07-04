@@ -84,8 +84,8 @@ impl Scene {
             for x in x_start..x_end {
                 let mut color_sum = Color::new(0.0, 0.0, 0.0);
                 for _ in 0..options.samples {
-                    let frac_x = (x as f32 + random()) / (options.width as f32);
-                    let frac_y = (y as f32 + random()) / (options.height as f32);
+                    let frac_x = (x as f32 + random(0.0, 1.0)) / (options.width as f32);
+                    let frac_y = (y as f32 + random(0.0, 1.0)) / (options.height as f32);
 
                     let ray = self.camera.ray(frac_x, frac_y);
                     let color =

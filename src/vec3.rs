@@ -48,9 +48,23 @@ impl Vec3 {
         r_perp + r_para
     }
 
+    pub fn near_zero(&self) -> bool {
+        let epsilon = 1e-7;
+        (self.x.abs() < epsilon) && (self.y.abs() < epsilon) && (self.z.abs() < epsilon)
+    }
+
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
-            let v = Vec3::new(random(), random(), random());
+            let v = Vec3::new(random(-1.0, 1.0), random(-1.0, 1.0), random(-1.0, 1.0));
+            if v.len() < 1.0 {
+                return v;
+            }
+        }
+    }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let v = Vec3::new(random(-1.0, 1.0), random(-1.0, 1.0), 0.0);
             if v.len() < 1.0 {
                 return v;
             }

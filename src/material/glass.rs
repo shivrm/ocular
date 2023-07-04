@@ -26,7 +26,7 @@ impl Material for Glass {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = ri_inverse * sin_theta > 1.0;
-        let target = if cannot_refract || schlick(cos_theta, ri_inverse) > random() {
+        let target = if cannot_refract || schlick(cos_theta, ri_inverse) > random(0.0, 1.0) {
             unit_direction.reflect(hit_record.normal)
         } else {
             unit_direction.refract(hit_record.normal, ri_inverse)
