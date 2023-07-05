@@ -1,4 +1,4 @@
-use super::{random, Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture};
+use super::{random, Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture, Trig};
 use std::sync::mpsc;
 
 #[derive(Debug, Clone, Copy)]
@@ -35,6 +35,17 @@ impl Scene {
     pub fn ray_color(&self, ray: Ray, t_min: f32, t_max: f32, bounces: usize) -> Color {
         if bounces == 0 {
             return Color::new(0.0, 0.0, 0.0);
+        }
+
+        let trig = Trig::new(
+            Point::new(1.0, 0.0, 0.0),
+            Point::new(1.0, 1.0, 0.0),
+            Point::new(1.0, 0.0, 1.0),
+        );
+
+        if let Some(record) = trig.hit(ray) {
+            let (u, v) = record.uv;
+            return Color::new(u, v, 0.0);
         }
 
         let record = self.hit(ray, t_min, t_max);

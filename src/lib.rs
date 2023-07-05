@@ -22,6 +22,9 @@ pub use object::{HitRecord, Hittable};
 pub mod material;
 pub use material::Material;
 
+pub mod trig;
+pub use trig::Trig;
+
 // Aliases
 pub type Point = Vec3;
 pub type Color = Vec3;
