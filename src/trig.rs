@@ -63,12 +63,17 @@ impl Trig {
 
 pub struct Mesh {
     trigs: Vec<Trig>,
+    center: Point,
     material: Box<dyn Material>,
 }
 
 impl Mesh {
-    pub fn new(trigs: Vec<Trig>, material: Box<dyn Material>) -> Self {
-        Self { trigs, material }
+    pub fn new(trigs: Vec<Trig>, center: Point, material: Box<dyn Material>) -> Self {
+        Self {
+            trigs,
+            center,
+            material,
+        }
     }
 }
 
@@ -77,8 +82,10 @@ impl Hittable for Mesh {
         let mut hit_record: Option<TrigHitRecord> = None;
         let mut hit_t = t_max;
 
+        let transformed_ray = Ray::new(ray.origin - self.center, ray.direction);
+
         for trig in self.trigs.iter() {
-            match trig.hit(ray) {
+            match trig.hit(transformed_ray) {
                 Some(record) => {
                     if record.t < hit_t && record.t > t_min {
                         hit_t = record.t;
@@ -91,7 +98,7 @@ impl Hittable for Mesh {
 
         if let Some(r) = hit_record {
             Some(HitRecord {
-                point: r.point,
+                point: r.point + self.center,
                 normal: r.normal,
                 front_face: r.front_face,
                 t: r.t,

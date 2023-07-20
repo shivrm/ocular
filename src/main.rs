@@ -105,7 +105,8 @@ fn main() {
         ];
         let texture = texture::Solid::new(Color::new(0.8, 0.3, 0.3));
         let material = material::Diffuse::new(Box::new(texture));
-        let mesh = Mesh::new(trigs, Box::new(material));
+        let center = Point::new(0.0, 1.0, 0.0);
+        let mesh = Mesh::new(trigs, center, Box::new(material));
         Box::new(mesh)
     };
 

@@ -1,4 +1,4 @@
-use super::{random, Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture, Trig};
+use super::{random, Camera, Color, HitRecord, Hittable, Image, Pixel, Point, Ray, Texture};
 use std::sync::mpsc;
 
 #[derive(Debug, Clone, Copy)]
