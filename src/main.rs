@@ -9,7 +9,7 @@ const CAMERA_UP: Point = Point::new(0.0, 1.0, 0.0);
 const FOV: f32 = 20.0;
 const ASPECT_RATIO: f32 = (WIDTH as f32) / (HEIGHT as f32);
 const APERTURE: f32 = 0.1;
-const FOCUS_DIST: f32 = 10.0;
+const FOCUS_DIST: f32 = 13.5;
 
 const SAMPLES_PER_PIXEL: usize = 64;
 const BOUNCES: usize = 16;
@@ -39,6 +39,77 @@ fn main() {
     };
 
     objects.push(ground);
+
+    let mesh = {
+        let trigs = vec![
+            Trig::new(
+                Vec3::new(-1.0, 1.0, -1.0),
+                Vec3::new(1.0, 1.0, 1.0),
+                Vec3::new(1.0, 1.0, -1.0),
+            ),
+            Trig::new(
+                Vec3::new(1.0, 1.0, 1.0),
+                Vec3::new(-1.0, -1.0, 1.0),
+                Vec3::new(1.0, -1.0, 1.0),
+            ),
+            Trig::new(
+                Vec3::new(-1.0, 1.0, 1.0),
+                Vec3::new(-1.0, -1.0, -1.0),
+                Vec3::new(-1.0, -1.0, 1.0),
+            ),
+            Trig::new(
+                Vec3::new(1.0, -1.0, -1.0),
+                Vec3::new(-1.0, -1.0, 1.0),
+                Vec3::new(-1.0, -1.0, -1.0),
+            ),
+            Trig::new(
+                Vec3::new(1.0, 1.0, -1.0),
+                Vec3::new(1.0, -1.0, 1.0),
+                Vec3::new(1.0, -1.0, -1.0),
+            ),
+            Trig::new(
+                Vec3::new(-1.0, 1.0, -1.0),
+                Vec3::new(1.0, -1.0, -1.0),
+                Vec3::new(-1.0, -1.0, -1.0),
+            ),
+            Trig::new(
+                Vec3::new(-1.0, 1.0, -1.0),
+                Vec3::new(-1.0, 1.0, 1.0),
+                Vec3::new(1.0, 1.0, 1.0),
+            ),
+            Trig::new(
+                Vec3::new(1.0, 1.0, 1.0),
+                Vec3::new(-1.0, 1.0, 1.0),
+                Vec3::new(-1.0, -1.0, 1.0),
+            ),
+            Trig::new(
+                Vec3::new(-1.0, 1.0, 1.0),
+                Vec3::new(-1.0, 1.0, -1.0),
+                Vec3::new(-1.0, -1.0, -1.0),
+            ),
+            Trig::new(
+                Vec3::new(1.0, -1.0, -1.0),
+                Vec3::new(1.0, -1.0, 1.0),
+                Vec3::new(-1.0, -1.0, 1.0),
+            ),
+            Trig::new(
+                Vec3::new(1.0, 1.0, -1.0),
+                Vec3::new(1.0, 1.0, 1.0),
+                Vec3::new(1.0, -1.0, 1.0),
+            ),
+            Trig::new(
+                Vec3::new(-1.0, 1.0, -1.0),
+                Vec3::new(1.0, 1.0, -1.0),
+                Vec3::new(1.0, -1.0, -1.0),
+            ),
+        ];
+        let texture = texture::Solid::new(Color::new(0.8, 0.3, 0.3));
+        let material = material::Diffuse::new(Box::new(texture));
+        let mesh = Mesh::new(trigs, Box::new(material));
+        Box::new(mesh)
+    };
+
+    objects.push(mesh);
 
     let options = RenderOptions {
         width: WIDTH,

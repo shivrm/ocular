@@ -23,7 +23,7 @@ pub mod material;
 pub use material::Material;
 
 pub mod trig;
-pub use trig::Trig;
+pub use trig::{Mesh, Trig};
 
 // Aliases
 pub type Point = Vec3;

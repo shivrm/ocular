@@ -1,4 +1,4 @@
-use super::{Point, Ray, Vec3};
+use super::{HitRecord, Hittable, Material, Point, Ray, Vec3};
 
 pub struct TrigHitRecord {
     pub point: Point,
@@ -58,5 +58,48 @@ impl Trig {
             uv: (u, v),
         };
         Some(hit_record)
+    }
+}
+
+pub struct Mesh {
+    trigs: Vec<Trig>,
+    material: Box<dyn Material>,
+}
+
+impl Mesh {
+    pub fn new(trigs: Vec<Trig>, material: Box<dyn Material>) -> Self {
+        Self { trigs, material }
+    }
+}
+
+impl Hittable for Mesh {
+    fn hit(&self, ray: Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+        let mut hit_record: Option<TrigHitRecord> = None;
+        let mut hit_t = t_max;
+
+        for trig in self.trigs.iter() {
+            match trig.hit(ray) {
+                Some(record) => {
+                    if record.t < hit_t && record.t > t_min {
+                        hit_t = record.t;
+                        hit_record = Some(record);
+                    }
+                }
+                None => (),
+            }
+        }
+
+        if let Some(r) = hit_record {
+            Some(HitRecord {
+                point: r.point,
+                normal: r.normal,
+                front_face: r.front_face,
+                t: r.t,
+                uv: r.uv,
+                material: &*self.material,
+            })
+        } else {
+            None
+        }
     }
 }

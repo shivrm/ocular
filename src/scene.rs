@@ -37,17 +37,6 @@ impl Scene {
             return Color::new(0.0, 0.0, 0.0);
         }
 
-        let trig = Trig::new(
-            Point::new(1.0, 0.0, 0.0),
-            Point::new(1.0, 1.0, 0.0),
-            Point::new(1.0, 0.0, 1.0),
-        );
-
-        if let Some(record) = trig.hit(ray) {
-            let (u, v) = record.uv;
-            return Color::new(u, v, 0.0);
-        }
-
         let record = self.hit(ray, t_min, t_max);
 
         if record.is_some() {
