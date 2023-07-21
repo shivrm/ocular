@@ -65,15 +65,64 @@ pub struct Mesh {
     trigs: Vec<Trig>,
     center: Point,
     material: Box<dyn Material>,
+    aabb: (Vec3, Vec3),
 }
 
 impl Mesh {
     pub fn new(trigs: Vec<Trig>, center: Point, material: Box<dyn Material>) -> Self {
+        // Calculate AABB
+
+        let (mut x_min, mut y_min, mut z_min) = (f32::INFINITY, f32::INFINITY, f32::INFINITY);
+        let (mut x_max, mut y_max, mut z_max) =
+            (f32::NEG_INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY);
+        for trig in trigs.iter() {
+            for v in [trig.v1, trig.v2, trig.v3] {
+                x_min = x_min.min(v.x);
+                y_min = y_min.min(v.y);
+                z_min = z_min.min(v.z);
+                x_max = x_max.max(v.x);
+                y_max = y_max.max(v.y);
+                z_max = z_max.max(v.z);
+            }
+        }
+
         Self {
             trigs,
             center,
             material,
+            aabb: (
+                Vec3::new(x_min, y_min, z_min),
+                Vec3::new(x_max, y_max, z_max),
+            ),
         }
+    }
+
+    pub fn hit_aabb(&self, ray: Ray, t_min: f32, t_max: f32) -> bool {
+        let (a, b) = self.aabb;
+
+        let rmin = a - ray.origin;
+        let rmax = b - ray.origin;
+        let d = ray.direction;
+
+        let t0 = f32::min(rmin.x / d.x, rmax.x / d.x);
+        let t1 = f32::max(rmin.x / d.x, rmax.x / d.x);
+        if f32::max(t0, t_min) >= f32::min(t1, t_max) {
+            return false;
+        }
+
+        let t0 = f32::min(rmin.y / d.y, rmax.y / d.y);
+        let t1 = f32::max(rmin.y / d.y, rmax.y / d.y);
+        if f32::max(t0, t_min) >= f32::min(t1, t_max) {
+            return false;
+        }
+
+        let t0 = f32::min(rmin.z / d.z, rmax.z / d.z);
+        let t1 = f32::max(rmin.z / d.z, rmax.z / d.z);
+        if f32::max(t0, t_min) >= f32::min(t1, t_max) {
+            return false;
+        }
+
+        return true;
     }
 }
 
@@ -83,6 +132,10 @@ impl Hittable for Mesh {
         let mut hit_t = t_max;
 
         let transformed_ray = Ray::new(ray.origin - self.center, ray.direction);
+
+        if !self.hit_aabb(transformed_ray, t_min, t_max) {
+            return None;
+        }
 
         for trig in self.trigs.iter() {
             match trig.hit(transformed_ray) {

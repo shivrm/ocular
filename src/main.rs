@@ -3,7 +3,7 @@ use ocular::*;
 const WIDTH: usize = 640;
 const HEIGHT: usize = 480;
 
-const LOOKFROM: Point = Point::new(13.0, 2.0, 3.0);
+const LOOKFROM: Point = Point::new(-8.0, 3.0, 10.5);
 const LOOKAT: Point = Point::new(0.0, 0.0, 0.0);
 const CAMERA_UP: Point = Point::new(0.0, 1.0, 0.0);
 const FOV: f32 = 20.0;
@@ -103,7 +103,7 @@ fn main() {
                 Vec3::new(1.0, -1.0, -1.0),
             ),
         ];
-        let texture = texture::Solid::new(Color::new(0.8, 0.3, 0.3));
+        let texture = texture::Solid::new(Color::new(0.8, 0.2, 0.2));
         let material = material::Diffuse::new(Box::new(texture));
         let center = Point::new(0.0, 1.0, 0.0);
         let mesh = Mesh::new(trigs, center, Box::new(material));
