@@ -1,4 +1,5 @@
 use super::{HitRecord, Hittable, Material, Point, Ray, Vec3};
+use obj::Obj;
 
 pub struct TrigHitRecord {
     pub point: Point,
@@ -62,32 +63,37 @@ impl Trig {
 }
 
 pub struct Mesh {
-    trigs: Vec<Trig>,
+    vertices: Vec<Point>,
+    faces: Vec<[u32; 3]>,
     center: Point,
     material: Box<dyn Material>,
     aabb: (Vec3, Vec3),
 }
 
 impl Mesh {
-    pub fn new(trigs: Vec<Trig>, center: Point, material: Box<dyn Material>) -> Self {
+    pub fn new(
+        vertices: Vec<Point>,
+        faces: Vec<[u32; 3]>,
+        center: Point,
+        material: Box<dyn Material>,
+    ) -> Self {
         // Calculate AABB
 
         let (mut x_min, mut y_min, mut z_min) = (f32::INFINITY, f32::INFINITY, f32::INFINITY);
         let (mut x_max, mut y_max, mut z_max) =
             (f32::NEG_INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY);
-        for trig in trigs.iter() {
-            for v in [trig.v1, trig.v2, trig.v3] {
-                x_min = x_min.min(v.x);
-                y_min = y_min.min(v.y);
-                z_min = z_min.min(v.z);
-                x_max = x_max.max(v.x);
-                y_max = y_max.max(v.y);
-                z_max = z_max.max(v.z);
-            }
+        for v in vertices.iter() {
+            x_min = x_min.min(v.x);
+            y_min = y_min.min(v.y);
+            z_min = z_min.min(v.z);
+            x_max = x_max.max(v.x);
+            y_max = y_max.max(v.y);
+            z_max = z_max.max(v.z);
         }
 
         Self {
-            trigs,
+            vertices,
+            faces,
             center,
             material,
             aabb: (
@@ -95,6 +101,27 @@ impl Mesh {
                 Vec3::new(x_max, y_max, z_max),
             ),
         }
+    }
+
+    pub fn from_obj(
+        obj: Obj<obj::TexturedVertex, u32>,
+        center: Point,
+        material: Box<dyn Material>,
+    ) -> Self {
+        let mut vertices: Vec<Point> = Vec::new();
+
+        for v in obj.vertices {
+            let point = Point::new(v.position[0], v.position[1], v.position[2]);
+            vertices.push(point);
+        }
+
+        let mut faces: Vec<[u32; 3]> = Vec::new();
+
+        for indices in obj.indices.chunks_exact(3) {
+            faces.push([indices[0], indices[1], indices[2]]);
+        }
+
+        Self::new(vertices, faces, center, material)
     }
 
     pub fn hit_aabb(&self, ray: Ray, t_min: f32, t_max: f32) -> bool {
@@ -137,7 +164,13 @@ impl Hittable for Mesh {
             return None;
         }
 
-        for trig in self.trigs.iter() {
+        for face in self.faces.iter() {
+            let trig = Trig::new(
+                self.vertices[face[0] as usize],
+                self.vertices[face[1] as usize],
+                self.vertices[face[2] as usize],
+            );
+
             match trig.hit(transformed_ray) {
                 Some(record) => {
                     if record.t < hit_t && record.t > t_min {

@@ -22,8 +22,8 @@ pub use object::{HitRecord, Hittable};
 pub mod material;
 pub use material::Material;
 
-pub mod trig;
-pub use trig::{Mesh, Trig};
+pub mod mesh;
+pub use mesh::{Mesh, Trig};
 
 // Aliases
 pub type Point = Vec3;

@@ -41,72 +41,13 @@ fn main() {
     objects.push(ground);
 
     let mesh = {
-        let trigs = vec![
-            Trig::new(
-                Vec3::new(-1.0, 1.0, -1.0),
-                Vec3::new(1.0, 1.0, 1.0),
-                Vec3::new(1.0, 1.0, -1.0),
-            ),
-            Trig::new(
-                Vec3::new(1.0, 1.0, 1.0),
-                Vec3::new(-1.0, -1.0, 1.0),
-                Vec3::new(1.0, -1.0, 1.0),
-            ),
-            Trig::new(
-                Vec3::new(-1.0, 1.0, 1.0),
-                Vec3::new(-1.0, -1.0, -1.0),
-                Vec3::new(-1.0, -1.0, 1.0),
-            ),
-            Trig::new(
-                Vec3::new(1.0, -1.0, -1.0),
-                Vec3::new(-1.0, -1.0, 1.0),
-                Vec3::new(-1.0, -1.0, -1.0),
-            ),
-            Trig::new(
-                Vec3::new(1.0, 1.0, -1.0),
-                Vec3::new(1.0, -1.0, 1.0),
-                Vec3::new(1.0, -1.0, -1.0),
-            ),
-            Trig::new(
-                Vec3::new(-1.0, 1.0, -1.0),
-                Vec3::new(1.0, -1.0, -1.0),
-                Vec3::new(-1.0, -1.0, -1.0),
-            ),
-            Trig::new(
-                Vec3::new(-1.0, 1.0, -1.0),
-                Vec3::new(-1.0, 1.0, 1.0),
-                Vec3::new(1.0, 1.0, 1.0),
-            ),
-            Trig::new(
-                Vec3::new(1.0, 1.0, 1.0),
-                Vec3::new(-1.0, 1.0, 1.0),
-                Vec3::new(-1.0, -1.0, 1.0),
-            ),
-            Trig::new(
-                Vec3::new(-1.0, 1.0, 1.0),
-                Vec3::new(-1.0, 1.0, -1.0),
-                Vec3::new(-1.0, -1.0, -1.0),
-            ),
-            Trig::new(
-                Vec3::new(1.0, -1.0, -1.0),
-                Vec3::new(1.0, -1.0, 1.0),
-                Vec3::new(-1.0, -1.0, 1.0),
-            ),
-            Trig::new(
-                Vec3::new(1.0, 1.0, -1.0),
-                Vec3::new(1.0, 1.0, 1.0),
-                Vec3::new(1.0, -1.0, 1.0),
-            ),
-            Trig::new(
-                Vec3::new(-1.0, 1.0, -1.0),
-                Vec3::new(1.0, 1.0, -1.0),
-                Vec3::new(1.0, -1.0, -1.0),
-            ),
-        ];
+        let file = std::fs::File::open("./cube.obj").unwrap();
+        let obj = obj::load_obj(std::io::BufReader::new(file)).unwrap();
+
         let texture = texture::Solid::new(Color::new(0.8, 0.2, 0.2));
         let material = material::Diffuse::new(Box::new(texture));
         let center = Point::new(0.0, 1.0, 0.0);
-        let mesh = Mesh::new(trigs, center, Box::new(material));
+        let mesh = Mesh::from_obj(obj, center, Box::new(material));
         Box::new(mesh)
     };
 
