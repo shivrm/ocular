@@ -11,11 +11,11 @@ const ASPECT_RATIO: f32 = (WIDTH as f32) / (HEIGHT as f32);
 const APERTURE: f32 = 0.1;
 const FOCUS_DIST: f32 = 13.5;
 
-const SAMPLES_PER_PIXEL: usize = 16;
-const BOUNCES: usize = 8;
+const SAMPLES_PER_PIXEL: usize = 64;
+const BOUNCES: usize = 16;
 const CLIP_START: f32 = 0.01;
 const CLIP_END: f32 = f32::INFINITY;
-const BLOCK_SIZE: usize = 32;
+const BLOCK_SIZE: usize = 128;
 
 fn main() {
     let camera = Camera::new(
@@ -27,13 +27,14 @@ fn main() {
         APERTURE,
         FOCUS_DIST,
     );
-    let sky = texture::Solid::new(Color::new(0.0, 0.0, 0.0));
+    let sky = texture::Solid::new(Color::new(0.1, 0.1, 0.1));
 
     let mut objects: Vec<Box<dyn Hittable>> = Vec::new();
 
     let ground = {
-        let texture = texture::Solid::new(Color::new(0.5, 0.5, 0.5));
-        let material = material::Diffuse::new(Box::new(texture));
+        let texture =
+            texture::Checkered::new(Color::new(0.0, 0.0, 0.0), Color::new(1.0, 1.0, 1.0), 10.0);
+        let material = material::Metal::new(Box::new(texture), 0.3);
         let sphere = object::Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0, Box::new(material));
         Box::new(sphere)
     };
@@ -44,7 +45,7 @@ fn main() {
         let file = std::fs::File::open("./cube.obj").unwrap();
         let obj = obj::load_obj(std::io::BufReader::new(file)).unwrap();
 
-        let texture = texture::Solid::new(Color::new(0.8, 0.2, 0.2));
+        let texture = texture::Solid::new(Color::new(0.3, 0.3, 0.8));
         let material = material::Diffuse::new(Box::new(texture));
         let center = Point::new(0.0, 1.0, 0.0);
         let mesh = Mesh::from_obj(obj, center, Box::new(material));
@@ -54,9 +55,9 @@ fn main() {
     objects.push(mesh);
 
     let light = {
-        let texture = texture::Solid::new(Color::new(0.19, 0.80, 0.19) * 6.0);
+        let texture = texture::Solid::new(Color::new(1.0, 1.0, 1.0) * 10.0);
         let material = material::Light::new(Box::new(texture));
-        let sphere = object::Sphere::new(Point::new(3.0, 2.0, -3.0), 0.5, Box::new(material));
+        let sphere = object::Sphere::new(Point::new(3.0, 4.0, 1.0), 0.5, Box::new(material));
         Box::new(sphere)
     };
 

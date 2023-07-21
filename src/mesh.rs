@@ -47,7 +47,7 @@ impl Trig {
 
         let t = f * edge2.dot(&q);
         let point = p + (t * d);
-        let normal = edge1.cross(&edge2);
+        let normal = edge1.cross(&edge2).unit();
         let front_face = d.dot(&normal) < 0.0;
         let normal = if front_face { normal } else { -normal };
 

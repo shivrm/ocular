@@ -38,3 +38,29 @@ impl Texture for Solid {
         self.color
     }
 }
+
+pub struct Checkered {
+    color1: Color,
+    color2: Color,
+    size: f32,
+}
+
+impl Checkered {
+    pub const fn new(color1: Color, color2: Color, size: f32) -> Self {
+        Self {
+            color1,
+            color2,
+            size,
+        }
+    }
+}
+
+impl Texture for Checkered {
+    fn color(&self, u: f32, v: f32, p: Point) -> Color {
+        if (p.x * self.size).sin() * (p.y * self.size).sin() * (p.z * self.size).sin() < 0.0 {
+            self.color1
+        } else {
+            self.color2
+        }
+    }
+}
