@@ -41,14 +41,24 @@ impl Scene {
 
         if record.is_some() {
             let record = record.unwrap();
-            let (scattered, color1) = record.material.scatter(ray, record);
-            let color2 = self.ray_color(scattered, t_min, t_max, bounces - 1);
 
-            Color::new(
-                color1.x * color2.x,
-                color1.y * color2.y,
-                color1.z * color2.z,
-            )
+            let (u, v) = record.uv;
+            let point = record.point.clone();
+            let material = record.material;
+
+            let scatter = material.scatter(ray, record);
+            if scatter.is_none() {
+                material.emit(u, v, point)
+            } else {
+                let (scattered, color1) = scatter.unwrap();
+                let color2 = self.ray_color(scattered, t_min, t_max, bounces - 1);
+
+                Color::new(
+                    color1.x * color2.x,
+                    color1.y * color2.y,
+                    color1.z * color2.z,
+                )
+            }
         } else {
             let (u, v) = super::texture::uv_coords(ray.direction);
             let p = Point::new(f32::INFINITY, f32::INFINITY, f32::INFINITY);

@@ -12,18 +12,18 @@ impl Diffuse {
 }
 
 impl Material for Diffuse {
-    fn scatter(&self, _ray: Ray, hit_record: HitRecord) -> (Ray, Color) {
+    fn scatter(&self, _ray: Ray, hit_record: HitRecord) -> Option<(Ray, Color)> {
         let (u, v) = hit_record.uv;
         let color = self.texture.color(u, v, hit_record.point);
 
-        let mut target = hit_record.normal + Vec3::random_in_unit_sphere();
+        let mut target = Vec3::random_in_unit_sphere();
 
-        if target.near_zero() {
-            target = hit_record.normal;
+        if target.dot(&hit_record.normal) < 0.0 {
+            target = -target;
         }
 
         let scattered = Ray::new(hit_record.point, target);
 
-        (scattered, color)
+        Some((scattered, color))
     }
 }

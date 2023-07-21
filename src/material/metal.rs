@@ -13,7 +13,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: Ray, hit_record: HitRecord) -> (Ray, Color) {
+    fn scatter(&self, ray: Ray, hit_record: HitRecord) -> Option<(Ray, Color)> {
         let (u, v) = hit_record.uv;
         let color = self.texture.color(u, v, hit_record.point);
 
@@ -21,6 +21,6 @@ impl Material for Metal {
         let random = self.roughness * Vec3::random_in_unit_sphere();
         let scattered = Ray::new(hit_record.point, target + random);
 
-        (scattered, color)
+        Some((scattered, color))
     }
 }

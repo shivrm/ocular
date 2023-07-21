@@ -12,7 +12,7 @@ impl Glass {
 }
 
 impl Material for Glass {
-    fn scatter(&self, ray: Ray, hit_record: HitRecord) -> (Ray, Color) {
+    fn scatter(&self, ray: Ray, hit_record: HitRecord) -> Option<(Ray, Color)> {
         let color = Color::new(1.0, 1.0, 1.0);
 
         let ri_inverse = if hit_record.front_face {
@@ -33,7 +33,8 @@ impl Material for Glass {
         };
 
         let scattered = Ray::new(hit_record.point, target);
-        (scattered, color)
+
+        Some((scattered, color))
     }
 }
 
