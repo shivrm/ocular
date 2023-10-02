@@ -11,8 +11,8 @@ const ASPECT_RATIO: f32 = (WIDTH as f32) / (HEIGHT as f32);
 const APERTURE: f32 = 0.1;
 const FOCUS_DIST: f32 = 13.5;
 
-const SAMPLES_PER_PIXEL: usize = 64;
-const BOUNCES: usize = 16;
+const SAMPLES_PER_PIXEL: usize = 16;
+const BOUNCES: usize = 2;
 const CLIP_START: f32 = 0.01;
 const CLIP_END: f32 = f32::INFINITY;
 const BLOCK_SIZE: usize = 128;
@@ -42,12 +42,12 @@ fn main() {
     objects.push(ground);
 
     let mesh = {
-        let file = std::fs::File::open("./cube.obj").unwrap();
+        let file = std::fs::File::open("assets/teapot.obj").unwrap();
         let obj = obj::load_obj(std::io::BufReader::new(file)).unwrap();
 
         let texture = texture::Solid::new(Color::new(0.3, 0.3, 0.8));
         let material = material::Diffuse::new(Box::new(texture));
-        let center = Point::new(0.0, 1.0, 0.0);
+        let center = Point::new(0.0, 0.0, 0.0);
         let mesh = Mesh::from_obj(obj, center, Box::new(material));
         Box::new(mesh)
     };
@@ -85,5 +85,5 @@ fn main() {
         }
     }
 
-    bitmap.save("result.bmp").unwrap();
+    bitmap.save("assets/result.bmp").unwrap();
 }
